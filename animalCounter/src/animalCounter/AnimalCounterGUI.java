@@ -5,90 +5,144 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class AnimalCounterGUI {
-    private final Alligator alligator = new Alligator();
-    private final Sheep sheep = new Sheep();
+public class AnimalCounterGUI extends JFrame {
 
-    private JLabel alligatorLabel;
-    private JLabel sheepLabel;
-    private JRadioButton alligatorRadioButton;
-    private JRadioButton sheepRadioButton;
+    private JLabel welcomeLabel, alligatorLabel, sheepLabel, blankLine;
+    private JButton addAlligatorButton, addSheepButton, displayCountsButton, resetCountsButton, exitButton;
+    private JRadioButton alligatorRadioButton, sheepRadioButton;
+    private ButtonGroup radioGroup;
+
+    private Alligator alligator;
+    private Sheep sheep;
 
     public AnimalCounterGUI() {
-        // Create the main frame
-        JFrame frame = new JFrame("Animal Counter");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(400, 300);
-        frame.setLayout(new GridLayout(8, 1));
+        // Create the Sheep object first
+        sheep = new Sheep();
 
-        // Welcome message
-        JLabel welcomeLabel = new JLabel("Welcome to the Animal Counter!", SwingConstants.CENTER);
-        frame.add(welcomeLabel);
+        // Now create the Alligator object, passing the Sheep instance
+        alligator = new Alligator(sheep);
 
-        // Count labels
-        alligatorLabel = new JLabel("Alligators: 0", SwingConstants.CENTER);
-        sheepLabel = new JLabel("Sheep: 0", SwingConstants.CENTER);
-        frame.add(alligatorLabel);
-        frame.add(sheepLabel);
+        // Set up the window
+        setTitle("Animal Counter");
+        setSize(400, 300);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
 
-        // Add Alligator button
-        JButton addAlligatorButton = new JButton("Add Alligator");
-        addAlligatorButton.addActionListener(e -> {
-            alligator.incrementCount();
-            updateLabels();
-        });
-        frame.add(addAlligatorButton);
+        // Set the layout to BoxLayout to stack components vertically
+        setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 
-        // Add Sheep button
-        JButton addSheepButton = new JButton("Add Sheep");
-        addSheepButton.addActionListener(e -> {
-            sheep.incrementCount();
-            updateLabels();
-        });
-        frame.add(addSheepButton);
+        // Create labels
+        welcomeLabel = new JLabel("Welcome to the Animal Counter!");
+        alligatorLabel = new JLabel("Alligator count: 0");
+        sheepLabel = new JLabel("Sheep count: 0");
+        blankLine = new JLabel("");  // Empty label for a blank line
 
-        // Display Counts button
-        JButton displayCountsButton = new JButton("Display Counts");
-        displayCountsButton.addActionListener(e -> {
-            JOptionPane.showMessageDialog(frame, 
-                "Alligators: " + alligator.getCount() + "\nSheep: " + sheep.getCount(),
-                "Current Counts", JOptionPane.INFORMATION_MESSAGE);
-        });
-        frame.add(displayCountsButton);
+        // Create buttons
+        addAlligatorButton = new JButton("Add Alligator");
+        addSheepButton = new JButton("Add Sheep");
+        displayCountsButton = new JButton("Display Counts");
+        resetCountsButton = new JButton("Reset Counts");
+        exitButton = new JButton("Exit");
 
-        // Reset Counts button and radio buttons
-        JPanel resetPanel = new JPanel(new FlowLayout());
+        // Create radio buttons
         alligatorRadioButton = new JRadioButton("Alligator");
         sheepRadioButton = new JRadioButton("Sheep");
-        ButtonGroup resetGroup = new ButtonGroup();
-        resetGroup.add(alligatorRadioButton);
-        resetGroup.add(sheepRadioButton);
-        resetPanel.add(alligatorRadioButton);
-        resetPanel.add(sheepRadioButton);
 
-        JButton resetCountsButton = new JButton("Reset Counts");
-        resetCountsButton.addActionListener(e -> {
-            if (alligatorRadioButton.isSelected()) {
-                alligator.resetCount();
-            } else if (sheepRadioButton.isSelected()) {
-                sheep.resetCount();
-            }
-            updateLabels();
-        });
+        // Group radio buttons
+        radioGroup = new ButtonGroup();
+        radioGroup.add(alligatorRadioButton);
+        radioGroup.add(sheepRadioButton);
+
+        // Add components to the frame
+        // Add welcome message centered
+        JPanel welcomePanel = new JPanel();
+        welcomePanel.add(welcomeLabel);
+        welcomePanel.setLayout(new FlowLayout(FlowLayout.CENTER));  // Center the welcome label
+        add(welcomePanel);
+
+        // Add blank line (empty label)
+        add(blankLine);
+
+        // Add alligator and sheep count labels, centered
+        JPanel countPanel = new JPanel();
+        countPanel.add(alligatorLabel);
+        countPanel.add(sheepLabel);
+        countPanel.setLayout(new FlowLayout(FlowLayout.CENTER));  // Center the count labels
+        add(countPanel);
+
+        // Add buttons for adding animals and displaying counts, centered
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(addAlligatorButton);
+        buttonPanel.add(addSheepButton);
+        buttonPanel.add(displayCountsButton);
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));  // Center the action buttons
+        add(buttonPanel);
+
+        // Add radio buttons for reset selection, centered, placed above the reset button
+        JPanel radioPanel = new JPanel();
+        radioPanel.add(alligatorRadioButton);
+        radioPanel.add(sheepRadioButton);
+        radioPanel.setLayout(new FlowLayout(FlowLayout.CENTER));  // Center the radio buttons
+        add(radioPanel);
+
+        // Add reset counts button, centered
+        JPanel resetPanel = new JPanel();
         resetPanel.add(resetCountsButton);
-        frame.add(resetPanel);
+        resetPanel.setLayout(new FlowLayout(FlowLayout.CENTER));  // Center the reset button
+        add(resetPanel);
 
-        // Exit button
-        JButton exitButton = new JButton("Exit");
-        exitButton.addActionListener(e -> System.exit(0));
-        frame.add(exitButton);
+        // Add exit button, centered
+        JPanel exitPanel = new JPanel();
+        exitPanel.add(exitButton);
+        exitPanel.setLayout(new FlowLayout(FlowLayout.CENTER));  // Center the exit button
+        add(exitPanel);
 
-        // Display the frame
-        frame.setVisible(true);
-    }
+        // Add button listeners
+        addAlligatorButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                alligator.incrementCount();
+                alligatorLabel.setText("Alligator count: " + alligator.getCount());
+            }
+        });
 
-    private void updateLabels() {
-        alligatorLabel.setText("Alligators: " + alligator.getCount());
-        sheepLabel.setText("Sheep: " + sheep.getCount());
+        addSheepButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sheep.incrementCount();
+                sheepLabel.setText("Sheep count: " + sheep.getCount());
+            }
+        });
+
+        displayCountsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                alligatorLabel.setText("Alligator count: " + alligator.getCount());
+                sheepLabel.setText("Sheep count: " + sheep.getCount());
+            }
+        });
+
+        resetCountsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (alligatorRadioButton.isSelected()) {
+                    alligator.resetCount();
+                    alligatorLabel.setText("Alligator count: " + alligator.getCount());
+                } else if (sheepRadioButton.isSelected()) {
+                    sheep.resetCount();
+                    sheepLabel.setText("Sheep count: " + sheep.getCount());
+                }
+            }
+        });
+
+        exitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+
+        // Make the window visible
+        setVisible(true);
     }
 }
